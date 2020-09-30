@@ -141,7 +141,7 @@ STATIC_URL = '/static/'
 #     STATIC_DIR,
 # ]
 
-STATIC_ROOT = Path(BASE_DIR / 'static')
+STATIC_ROOT = Path(BASE_DIR / 'static/')
 
 # Django Q settings
 Q_CLUSTER = {
