@@ -1,0 +1,24 @@
+{% extends "app/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block head %}
+<title>Delete {{ campaign }}?</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Delete Campaign {{ campaign }}?</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:home' %}">X</a>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        <button class="btn btn-info" type="submit" name="button">Yes</button>
+        <a class="btn btn-danger" href="{% url 'app:home' %}">No</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

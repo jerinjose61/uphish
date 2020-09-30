@@ -1,0 +1,54 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>Sending Profiles</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Sending Profiles</strong></h5>
+      <a class="btn btn-info float-right"href="{% url 'app:add_sending_profile' %}">
+        <i class="fas fa-plus"></i>
+        Add
+      </a>
+    </div>
+
+    <div class="card-body">
+      <table id="table" class="table">
+        <thead>
+          <th>Name</th>
+          <th>Email</th>
+          <th>SMTP Server</th>
+          <th>Port</th>
+          <th class="text-center">Actions</th>
+        </thead>
+        <tbody>
+          {% for sending_profile in sending_profiles %}
+          <tr>
+            <td>{{ sending_profile.name }}</td>
+            <td>{{ sending_profile.email }}</td>
+            <td>{{ sending_profile.smtp_server }}</td>
+            <td>{{ sending_profile.smtp_port }}</td>
+            <td class="text-center">
+              <a title="Edit" class="btn btn-primary" href="{% url 'app:edit_sending_profile' pk=sending_profile.pk %}"><i class="fas fa-edit"></i></a>
+              <a title="Delete" class="btn btn-danger" href="{% url 'app:delete_sending_profile' pk=sending_profile.pk %}"><i class="fas fa-trash-alt"></i></a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#table').DataTable({
+      "ordering": true // false to disable sorting (or any other option)
+    });
+});
+</script>
+{% endblock %}

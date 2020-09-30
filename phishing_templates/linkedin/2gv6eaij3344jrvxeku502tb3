@@ -1,0 +1,21 @@
+<svg version="1.1"
+    id="notify-pebble-images"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    height="96"
+    width="24">
+  <defs>
+    <symbol id="notify-pebble-16">
+      <path d="M7,7h2v5H7V7zM15,8c0,3.9-3.1,7-7,7c-3.9,0-7-3.1-7-7c0-3.9,3.1-7,7-7C11.9,1,15,4.1,15,8zM13.2,8c0-2.9-2.3-5.2-5.2-5.2C5.1,2.8,2.8,5.1,2.8,8c0,2.9,2.3,5.2,5.2,5.2C10.9,13.2,13.2,10.9,13.2,8zM7,6h2V4H7V6z"/>
+    </symbol>
+    <symbol id="notify-pebble-24">
+      <path d="M12,2C6.5,2,2,6.5,2,12c0,5.5,4.5,10,10,10c5.5,0,10-4.5,10-10C22,6.5,17.5,2,12,2zM12,20.2c-4.5,0-8.2-3.7-8.2-8.2S7.5,3.8,12,3.8s8.2,3.7,8.2,8.2S16.5,20.2,12,20.2zM11,10h2v8h-2V10zM11,6h2v2h-2V6z"/>
+    </symbol>
+  </defs>
+  <use xlink:href="#notify-pebble-16" x="0" y="0"  fill="#fff"></use>
+  <use xlink:href="#notify-pebble-16" x="0" y="16" fill="#000"></use>
+  <use xlink:href="#notify-pebble-16" x="0" y="32" fill="#000" fill-opacity="0.6"></use>
+  <use xlink:href="#notify-pebble-24" x="0" y="48" fill="#fff"></use>
+  <use xlink:href="#notify-pebble-24" x="0" y="72" fill="#000"></use>
+  <use xlink:href="#notify-pebble-24" x="0" y="96" fill="#000" fill-opacity="0.6"></use>
+</svg>

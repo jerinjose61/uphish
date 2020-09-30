@@ -1,0 +1,25 @@
+{% extends "app/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block head %}
+<title>Add Target</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Add Target</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:targets' pk=target_group.pk %}">X</a>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-info" type="submit" name="button">Save</button>
+        <a class="btn btn-danger" href="{% url 'app:targets' pk=target_group.pk %}">Back</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

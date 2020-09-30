@@ -1,0 +1,9 @@
+<svg id="svg-source" width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+  <defs id="ui-icons">
+    <svg id="search-icon" viewBox="0 0 24 24" width="24px" height="24px" x="0" y="0" preserveAspectRatio="xMinYMin meet">
+      <path d="M21,19.67l-5.44-5.44a7,7,0,1,0-1.33,1.33L19.67,21ZM10,15.13A5.13,5.13,0,1,1,15.13,10,5.13,5.13,0,0,1,10,15.13Z" class="large-icon" style="fill: currentColor" id="search-icon-large"/>
+    </svg>
+  </defs>
+
+  <use x="0" y="0" xlink:href="#search-icon" style="color: #7a8b98;" width="24px" height="24px"/>
+</svg>

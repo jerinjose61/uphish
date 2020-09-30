@@ -1,0 +1,7 @@
+{
+  "HOST":"localhost",
+  "DEBUG":"True",
+  "POSTGRESDBNAME":"uphish",
+  "POSTGRESUSER":"uphish",
+  "POSTGRESPASSWORD":"password"
+}

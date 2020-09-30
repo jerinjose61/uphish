@@ -1,0 +1,63 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>Phishing Pages</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Phishing Pages</strong></h5>
+      <a class="btn btn-info float-right"href="{% url 'app:add_phishing_page' %}">
+        <i class="fas fa-plus"></i>
+        Add
+      </a>
+    </div>
+
+    <div class="card-body">
+      <table id="table" class="table">
+        <thead>
+          <th>Name</th>
+          <th class="text-center">Server Status</th>
+          <th class="text-center">Port</th>
+          <th class="text-center">Site URL</th>
+          <th class="text-center">Server</th>
+          <th class="text-center">Action</th>
+        </thead>
+        <tbody>
+          {% for phishing_page in phishing_pages %}
+          <tr>
+            <td>{{ phishing_page.name }}</td>
+            <td class="text-center">{{ phishing_page.server_status }}</td>
+            <td class="text-center">{{ phishing_page.port_number }}</td>
+            <td class="text-center">
+              <a href={{ phishing_page.site_url }} target="_blank">{{ phishing_page.site_url }}</a>
+            </td>
+            <td class="text-center">
+              <a title="View Page" class="btn btn-success" href="{% url 'app:start_phishing_server' pk=phishing_page.pk %}">
+                Start
+              </a>
+              <a title="View Page" class="btn btn-danger" href="{% url 'app:stop_phishing_server' pk=phishing_page.pk %}">
+                Stop
+              </a>
+            </td>
+            <td class="text-center">
+              <a title="Delete" class="btn btn-danger" href="{% url 'app:delete_phishing_page' pk=phishing_page.pk %}"><i class="fas fa-trash-alt"></i></a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#table').DataTable({
+      "ordering": true // false to disable sorting (or any other option)
+    });
+});
+</script>
+{% endblock %}

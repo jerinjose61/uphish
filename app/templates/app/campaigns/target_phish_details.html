@@ -1,0 +1,88 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>{{ target.target.first_name }} {{ target.target.last_name }}</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>{{ target.target.first_name }} {{ target.target.last_name }}</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:campaign_details' pk=target.campaign.id %}">X</a>
+      {% if target.reported == False or target.reported == None %}
+      <a class="btn btn-info float-right mr-4"
+        href="{% url 'app:target_reported' campaign_id=target.campaign.id target_id=target.target.id %}">
+        Mark As Reported
+      </a>
+      {% else %}
+      <a class="btn btn-danger float-right mr-4"
+        href="{% url 'app:target_reported' campaign_id=target.campaign.id target_id=target.target.id %}">
+        Mark As Not Reported
+      </a>
+      {% endif %}
+
+    </div>
+
+    <div class="card-body">
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td>Name</td>
+            <td>{{ target.target.first_name }} {{ target.target.last_name }}</td>
+          </tr>
+          <tr>
+            <td>Email</td>
+            <td>{{ target.target.email }}</td>
+          </tr>
+          <tr>
+            <td>Status</td>
+            <td>
+              {% if target.email_sent_status == True %}
+              <i class="fas fa-check mr-2 text-success"></i>Sent
+              <br>
+              {% elif target.email_sent_status == False or target.email_sent_status == None %}
+              <i class="fas fa-times mr-2 text-danger"></i>Not Sent
+              <br>
+              {% endif %}
+              {% if target.email_open_status == True %}
+              <i class="fas fa-check mr-2 text-success"></i>Opened
+              <br>
+              {% elif target.email_open_status == False or target.email_open_status == None %}
+              <i class="fas fa-times mr-2 text-danger"></i>Not Opened
+              <br>
+              {% endif %}
+              {% if target.link_clicked_status == True %}
+              <i class="fas fa-check mr-2 text-success"></i>Clicked
+              <br>
+              {% elif target.link_clicked_status == False or target.link_clicked_status == None %}
+              <i class="fas fa-times mr-2 text-danger"></i>Not Clicked
+              <br>
+              {% endif %}
+              {% if target.data_submitted_status == True %}
+              <i class="fas fa-check mr-2 text-success"></i>Submitted Data
+              <br>
+              {% elif target.data_submitted_status == False or target.data_submitted_status == None %}
+              <i class="fas fa-times mr-2 text-danger"></i>Not Submitted Data
+              <br>
+              {% endif %}
+              {% if target.reported == True %}
+              <i class="fas fa-check mr-2 text-success"></i>Reported
+              <br>
+              {% elif target.reported == False or target.reported == None %}
+              <i class="fas fa-times mr-2 text-danger"></i>Not Reported
+              <br>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Submitted Data</td>
+            <td>{{ target.data_submitted }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

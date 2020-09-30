@@ -1,0 +1,26 @@
+{% extends "app/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block head %}
+<title>Edit Email Template</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Edit Email Template</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:email_templates' %}">X</a>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.media }}
+        {{ form|crispy }}
+        <button class="btn btn-info" type="submit" name="button">Update</button>
+        <a class="btn btn-danger" href="{% url 'app:email_templates' %}">Back</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

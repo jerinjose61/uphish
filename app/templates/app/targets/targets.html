@@ -1,0 +1,58 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>Targets - {{ target_group }}</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Targets - {{ target_group }}</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:target_groups' %}">X</a>
+      <a class="btn btn-info float-right mr-2"href="{% url 'app:add_target' pk=target_group.pk %}">
+        <i class="fas fa-plus"></i>
+        Add
+      </a>
+    </div>
+
+    <div class="card-body">
+      <table id="table" class="table">
+        <thead>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Designation</th>
+          <th class="text-center">Actions</th>
+        </thead>
+        <tbody>
+          {% for target in targets %}
+          <tr>
+            <td>{{ target.first_name }}</td>
+            <td>{{ target.last_name }}</td>
+            <td>{{ target.email }}</td>
+            <td>{{ target.designation }}</td>
+            <td class="text-center">
+              <a title="Edit" class="btn btn-primary" href="{% url 'app:edit_target' pk=target.pk %}">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a title="Delete" class="btn btn-danger" href="{% url 'app:delete_target' pk=target.pk %}">
+                <i class="fas fa-trash-alt"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#table').DataTable({
+      "ordering": true // false to disable sorting (or any other option)
+    });
+});
+</script>
+{% endblock %}

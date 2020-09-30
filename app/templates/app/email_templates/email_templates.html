@@ -1,0 +1,51 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>Email Templates</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Email Templates</strong></h5>
+      <a class="btn btn-info float-right"href="{% url 'app:add_email_template' %}">
+        <i class="fas fa-plus"></i>
+        Add
+      </a>
+    </div>
+
+    <div class="card-body">
+      <table id="table" class="table">
+        <thead>
+          <th>Name</th>
+          <th class="text-center">Action</th>
+        </thead>
+        <tbody>
+          {% for email_template in email_templates %}
+          <tr>
+            <td>{{ email_template.name }}</td>
+            <td class="text-center">
+              <a title="Edit" class="btn btn-primary" href="{% url 'app:edit_email_template' pk=email_template.pk %}">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a title="Delete" class="btn btn-danger" href="{% url 'app:delete_email_template' pk=email_template.pk %}">
+                <i class="fas fa-trash-alt"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#table').DataTable({
+      "ordering": true // false to disable sorting (or any other option)
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "app/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block head %}
+<title>Launch New Campaign</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Launch New Campaign</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:home' %}">X</a>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-info" type="submit" name="button">
+          <i class="fas fa-rocket"></i>
+          Launch
+        </button>
+        <a class="btn btn-danger" href="{% url 'app:home' %}">Back</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

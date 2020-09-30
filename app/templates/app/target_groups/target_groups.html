@@ -1,0 +1,55 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>Target Groups</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Target Groups</strong></h5>
+      <a class="btn btn-info float-right"href="{% url 'app:add_target_group' %}">
+        <i class="fas fa-plus"></i>
+        Add
+      </a>
+    </div>
+
+    <div class="card-body">
+      <table id="table" class="table">
+        <thead>
+          <th>Name</th>
+          <th class="text-center">Actions</th>
+        </thead>
+        <tbody>
+          {% for target_group in target_groups %}
+          <tr>
+            <td>{{ target_group.name }}</td>
+            <td class="text-center">
+              <a title="View Targets" class="btn btn-info" href="{% url 'app:targets' pk=target_group.pk %}">
+                <i class="fas fa-search-plus"></i>
+              </a>
+              <a title="Edit" class="btn btn-primary" href="{% url 'app:edit_target_group' pk=target_group.pk %}">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a title="Delete" class="btn btn-danger" href="{% url 'app:delete_target_group' pk=target_group.pk %}">
+                <i class="fas fa-trash-alt"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#table').DataTable({
+      "ordering": true // false to disable sorting (or any other option)
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>Campaign Details</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <h3>{{ campaign }}</h3>
+  <div class="row">
+    <div class="col-xl-4 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">TARGETS</div>
+              <div class="h5 mb-2 font-weight-bold text-gray-800">{{ target_count }}</div>
+            </div>
+            <div class="col-auto">
+              <em class="fas fa-user-friends fa-2x text-gray-300"></em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">SENT</div>
+              <div class="h5 mb-2 font-weight-bold text-gray-800">{{ sent_count }}</div>
+            </div>
+            <div class="col-auto">
+              <em class="fas fa-paper-plane fa-2x text-gray-300"></em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">OPENED</div>
+              <div class="h5 mb-2 font-weight-bold text-gray-800">{{ open_count }}</div>
+            </div>
+            <div class="col-auto">
+              <em class="fas fa-envelope-open fa-2x text-gray-300"></em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">CLICKED</div>
+              <div class="h5 mb-2 font-weight-bold text-gray-800">{{ click_count }}</div>
+            </div>
+            <div class="col-auto">
+              <em class="fas fa-hand-point-up fa-2x text-gray-300"></em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">SUBMITTED DATA</div>
+              <div class="h5 mb-2 font-weight-bold text-gray-800">{{ data_count }}</div>
+            </div>
+            <div class="col-auto">
+              <em class="fas fa-file-alt fa-2x text-gray-300"></em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">REPORTED</div>
+              <div class="h5 mb-2 font-weight-bold text-gray-800">{{ reported_count }}</div>
+            </div>
+            <div class="col-auto">
+              <em class="fas fa-exclamation-triangle fa-2x text-gray-300"></em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <table id="table" class="table">
+            <thead>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Designation</th>
+              <th>Status</th>
+              <th class="text-center">View Details</th>
+            </thead>
+            <tbody>
+              {% for target in targets %}
+              <tr>
+                <td>{{ target.target.first_name }} {{ target.target.last_name }}</td>
+                <td>{{ target.target.email }}</td>
+                <td>{{ target.target.designation }}</td>
+                <td>
+                  {% if target.email_sent_status == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Sent
+                  <br>
+                  {% elif target.email_sent_status == False or target.email_sent_status == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Sent
+                  <br>
+                  {% endif %}
+                  {% if target.email_open_status == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Opened
+                  <br>
+                  {% elif target.email_open_status == False or target.email_open_status == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Opened
+                  <br>
+                  {% endif %}
+                  {% if target.link_clicked_status == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Clicked
+                  <br>
+                  {% elif target.link_clicked_status == False or target.link_clicked_status == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Clicked
+                  <br>
+                  {% endif %}
+                  {% if target.data_submitted_status == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Submitted Data
+                  <br>
+                  {% elif target.data_submitted_status == False or target.data_submitted_status == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Submitted Data
+                  <br>
+                  {% endif %}
+                  {% if target.reported == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Reported
+                  <br>
+                  {% elif target.reported == False or target.reported == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Reported
+                  <br>
+                  {% endif %}
+                </td>
+                <td class="text-center text-white">
+                  <a title="Submitted Data" type="button" class="btn btn-info"
+                  href="{% url 'app:target_phish_details' campaign_id=campaign.pk target_id=target.target.pk %}">
+                    <i class="fas fa-search-plus"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#table').DataTable({
+      "ordering": true // false to disable sorting (or any other option)
+    });
+});
+</script>
+{% endblock %}
