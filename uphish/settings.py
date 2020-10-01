@@ -28,7 +28,7 @@ with open(str(BASE_DIR)+'/settings.json',"r") as infile:
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'jl$v$9(vmr5n4()_0hcd^6@@ozn0^+gsyh6ye0lwblc-xd(_$$'
+SECRET_KEY = settings_dict['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ast.literal_eval(settings_dict['DEBUG'])

@@ -3,5 +3,6 @@
   "DEBUG":"True",
   "POSTGRESDBNAME":"uphish",
   "POSTGRESUSER":"uphish",
-  "POSTGRESPASSWORD":"password"
+  "POSTGRESPASSWORD":"password",
+  "SECRET_KEY":"your_secret_key"
 }
