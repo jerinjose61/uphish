@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
