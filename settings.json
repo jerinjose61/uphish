@@ -1,5 +1,6 @@
 {
   "HOST":"localhost",
+  "USE_TLS":"False",
   "DEBUG":"True",
   "POSTGRESDBNAME":"uphish",
   "POSTGRESUSER":"uphish",

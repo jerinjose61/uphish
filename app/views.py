@@ -389,10 +389,16 @@ def add_email_template(request):
             email_html_file.write(form.cleaned_data['body'])
             email_html_file.close()
 
-            # Append the string for image tracker in html file
-            image_tracker_string = ("\n\n<img src=" +
-                                    "\'http://{{ host }}:8000/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
-                                    "height=1px width=1px>")
+            if ast.literal_eval(settings_dict['USE_TLS']) == True:
+                # Append the string for image tracker in html file
+                image_tracker_string = ("\n\n<img src=" +
+                                        "\'https://{{ host }}/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
+                                        "height=1px width=1px>")
+            else:
+                # Append the string for image tracker in html file
+                image_tracker_string = ("\n\n<img src=" +
+                                        "\'http://{{ host }}/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
+                                        "height=1px width=1px>")
 
             email_html_file = open(html_file_name, "a")
             email_html_file.write(image_tracker_string)
@@ -421,10 +427,16 @@ def edit_email_template(request, pk):
             email_html_file.write(form.cleaned_data['body'])
             email_html_file.close()
 
-            # Append the string for image tracker in html file
-            image_tracker_string = ("\n\n<img src=" +
-                                    "\'http://{{ host }}:8000/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
-                                    "height=1px width=1px>")
+            if ast.literal_eval(settings_dict['USE_TLS']) == True:
+                # Append the string for image tracker in html file
+                image_tracker_string = ("\n\n<img src=" +
+                                        "\'https://{{ host }}/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
+                                        "height=1px width=1px>")
+            else:
+                # Append the string for image tracker in html file
+                image_tracker_string = ("\n\n<img src=" +
+                                        "\'http://{{ host }}/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
+                                        "height=1px width=1px>")
 
             email_html_file = open(html_file_name, "a")
             email_html_file.write(image_tracker_string)
