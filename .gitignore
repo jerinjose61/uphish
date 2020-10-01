@@ -4,3 +4,4 @@ app/migrations/
 phishing_emails/
 phishing_templates/
 media/
+settings.json
