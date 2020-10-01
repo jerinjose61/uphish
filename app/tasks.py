@@ -34,7 +34,8 @@ def launch_campaign(campaign_name, from_email, target_group, email_template, sen
         try:
             email = EmailMessage(subject = subject, body = html_message, from_email = from_email,
             to = [target,], connection = email_backend)
-            email.attach_file(str(MEDIA_ROOT) + "/" + str(email_template.attachment))
+            if email_template.attachment:
+                email.attach_file(str(MEDIA_ROOT) + "/" + str(email_template.attachment))
             email.content_subtype = 'html'
             email.send()
             CampaignResult.objects.create(campaign = campaign, target = target,
