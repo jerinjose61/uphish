@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 
 # Global Variables
 DEFAULT_USER_AGENT = "\"Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/60.0\""
-DEFAULT_PORT = 8080
+DEFAULT_PORT = 8000
 httpd = None
 
 server_list = {}
