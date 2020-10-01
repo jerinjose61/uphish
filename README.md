@@ -15,5 +15,5 @@
 
   Read this deployment <a href="https://drive.google.com/file/d/1DgDFcuu9KFuOZll11IA6g7M2FB2z_Wph/view?usp=sharing">
     guide</a> to learn how to deploy it on an Ubuntu Server.
-  Additionally, you can watch this <a href="https://www.youtube.com/watch?v=8J8Kqkh1X9o">video</a> to see a demostration of deployment.
+  Additionally, you can watch this <a href="https://www.youtube.com/watch?v=8J8Kqkh1X9o">video</a> to see a demonstration of deployment.
 </p>
