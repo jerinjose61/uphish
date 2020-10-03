@@ -5,7 +5,7 @@
 <p>
   uphish is a free application to run phishing simulation campaigns with the objective to increase awareness among members of an organisation.
 
-  Know more by watching this <a href="https://www.youtube.com/watch?v=m4hL0ONFjK4">video</a>
+  Know how to use it by watching this <a href="https://www.youtube.com/watch?v=m4hL0ONFjK4">video</a>
 </p>
 
 <h3>How to deploy?</h3>
