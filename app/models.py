@@ -31,11 +31,8 @@ class Target(models.Model):
 
 class PhishingPage(models.Model):
     name = models.CharField(max_length = 1000)
-    url_to_clone = models.CharField(max_length = 1000)
-    template_dir = models.CharField(max_length = 1000)
-    server_status = models.BooleanField(null = True)
-    port_number = models.IntegerField(null = True, blank=True)
-    site_url = models.CharField(max_length = 1000, null = True)
+    phishing_url = models.CharField(max_length = 1000)
+    use_tls = models.BooleanField(null = True)
 
     def __str__(self):
         return self.name

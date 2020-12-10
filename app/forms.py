@@ -28,11 +28,13 @@ class TargetForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'email', 'designation']
 
 class PhishingPageForm(forms.ModelForm):
-    url_to_clone = forms.CharField(label="URL to Clone")
+    phishing_url = forms.CharField(label="Phishing URL (Without http / https)",
+                                    widget=forms.TextInput(attrs={'placeholder':'www.example.com'}))
+    use_tls = forms.BooleanField(label="Use TLS?", required=False)
 
     class Meta:
         model = PhishingPage
-        fields = ['name', 'url_to_clone']
+        fields = '__all__'
 
 class EmailTemplateForm(forms.ModelForm):
     attachment = forms.FileField(required = False)

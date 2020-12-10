@@ -9,90 +9,10 @@ from django_q.tasks import async_task, result
 from django.db.models import Q
 from urllib import parse
 from django.contrib.auth.decorators import login_required
-
-# Global Variables
-DEFAULT_USER_AGENT = "\"Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/60.0\""
-DEFAULT_PORT = 443
-httpd = None
-
-server_list = {}
-server_details = {}
+from django.views.decorators.csrf import csrf_exempt
 
 with open(str(BASE_DIR)+'/settings.json',"r") as infile:
     settings_dict = json.loads(infile.read())
-
-# Supporting Functions & Classes
-def port_check(port_number):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = s.connect_ex(('127.0.0.1', port_number))
-
-    if result != 0:
-        return True
-    else:
-        return False
-
-def port():
-    port_number = random.randint(1025, 65535)
-
-    if port_check(port_number) == True:
-        return port_number
-    else:
-        port()
-
-def start_server(server):
-    server.serve_forever()
-
-class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
-    def do_GET(self):
-        path = re.match(r'\/\?cid=[0-9]+&tid=[0-9]+', self.path)
-
-        try:
-            if self.path == path.group():
-                self.path = '/'
-        except AttributeError:
-            pass
-
-        return SimpleHTTPRequestHandler.do_GET(self)
-
-    def do_POST(self):
-        # Pattern for /?cid=1&tid=1
-        path = re.match(r'\/\?cid=[0-9]+&tid=[0-9]+', self.path)
-
-        try:
-            if self.path == path.group():
-                # Get campaign_id
-                campaign_id = parse.parse_qs(parse.urlparse(self.path).query)['cid'][0]
-
-                # Get target_id
-                target_id = parse.parse_qs(parse.urlparse(self.path).query)['tid'][0]
-
-                # Update DB that the person has entered data
-                campaign = Campaign.objects.get(id = campaign_id)
-                target = Target.objects.get(id = target_id)
-
-                CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True)
-
-                # Update DB with entered data
-                content_length = int(self.headers['Content-Length'])
-                body = self.rfile.read(content_length)
-                form_data = body.decode("utf-8")
-                form_data_list = form_data.split('&')
-
-                form_data_decoded_list = []
-
-                for data in form_data_list:
-                    form_data_decoded_list.append(parse.unquote(data))
-
-                final_form_data = '; '.join(form_data_decoded_list)
-
-                CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted = final_form_data)
-
-                # Redirect to the Redirect URL given by user after form submission
-                self.send_response(301)
-                self.send_header("location", campaign.redirect_url)
-                self.end_headers()
-        except AttributeError:
-            pass
 
 # Django Views
 @login_required
@@ -227,143 +147,24 @@ def phishing_pages(request):
 
 @login_required
 def add_phishing_page(request):
-    form = forms.PhishingPageForm(request.POST or None)
+    if request.method == "POST":
+        form = forms.PhishingPageForm(request.POST or None)
 
-    if form.is_valid():
-        # Download files from original website
-        wget_command = "wget -e robots=off -E -H -k -K -p -nH --cut-dirs=100 -nv {} --user-agent {} --directory-prefix={}"
-
-        template_folder_name = '_'.join(form.cleaned_data['name'].split()).lower()
-        TEMPLATE_DIR = os.path.join(BASE_DIR, 'phishing_templates/{}'.format(template_folder_name))
-
-        os.system(wget_command.format(form.cleaned_data['url_to_clone'],
-                    DEFAULT_USER_AGENT, TEMPLATE_DIR))
-
-        # Update DB details of the phishing page
-        PhishingPage.objects.create(name = form.cleaned_data['name'],
-                                    url_to_clone = form.cleaned_data['url_to_clone'],
-                                    template_dir = TEMPLATE_DIR)
-
-        # Rename HTML file to index.html if it is in another name (like login.html)
-        for file in os.listdir(TEMPLATE_DIR):
-            if file.endswith(".html") or file.endswith(".htm"):
-                if file != 'index.html':
-                    os.rename(TEMPLATE_DIR + "/" + file, TEMPLATE_DIR + "/index.html")
-
-        ## Remove the string action="" inside a form in index.html
-        ## This is to ensure do_POST() method in MySimpleHTTPRequestHandler works OK
-        html_file = open(TEMPLATE_DIR + "/index.html", "r")
-        html_file_content = html_file.read()
-        new_html_file_content = re.sub('<form .*>',"<form method=\"POST\">",html_file_content)
-        html_file.close()
-
-        # Write new string to index.html
-        new_html_file = open(TEMPLATE_DIR + "/index.html", "w")
-        new_html_file.write(new_html_file_content)
-        new_html_file.close()
-
-        return redirect('app:phishing_pages')
+        if form.is_valid():
+            form.save()
+            return redirect('app:phishing_pages')
+    else:
+        form = forms.PhishingPageForm()
 
     return render(request, 'app/phishing_pages/add_phishing_page.html', {'form':form})
-
-@login_required
-def start_phishing_server(request, pk):
-    phishing_page = PhishingPage.objects.get(pk = pk)
-
-    os.chdir(phishing_page.template_dir)
-    handler = MySimpleHTTPRequestHandler
-
-    global server_details
-    global server_list
-
-    if port_check(DEFAULT_PORT) == True:
-        try:
-            server = socketserver.TCPServer(("", DEFAULT_PORT), handler)
-            server_thread = threading.Thread(target=start_server, args=(server,), daemon=True)
-            server_thread.start()
-
-            server_details['server'] = server
-            server_details['server_thread'] = server_thread
-            server_details['port'] = DEFAULT_PORT
-        except socketserver.socket.error as exc:
-            if exc.args[0] == 48:
-                port_number = port()
-                server = socketserver.TCPServer(("", port_number), handler)
-                server_thread = threading.Thread(target=start_server, args=(server,), daemon=True)
-                server_thread.start()
-
-                server_details['server'] = server
-                server_details['server_thread'] = server_thread
-                server_details['port'] = port_number
-    else:
-        port_number = port()
-        server = socketserver.TCPServer(("", port_number), handler)
-        server_thread = threading.Thread(target=start_server, args=(server,), daemon=True)
-        server_thread.start()
-
-        server_details['server'] = server
-        server_details['server_thread'] = server_thread
-        server_details['port'] = port_number
-
-    server_list[phishing_page.name] = server_details
-
-    host = settings_dict['HOST']
-
-    PhishingPage.objects.filter(pk = phishing_page.pk).update(server_status = True,
-                                port_number = server_details['port'],
-                                site_url = "http://" + host + ":" + str(server_details['port']))
-
-    return redirect('app:phishing_pages')
-
-@login_required
-def stop_phishing_server(request, pk):
-    phishing_page = PhishingPage.objects.get(pk = pk)
-
-    try:
-        # Get details of server of this phishing page
-        global server_list
-        server = server_list[phishing_page.name]['server']
-
-        # Stop the server
-        server.shutdown()
-        server.server_close()
-
-        PhishingPage.objects.filter(pk = phishing_page.pk).update(server_status = False,
-                                    port_number = None,
-                                    site_url = None)
-    except KeyError:
-        PhishingPage.objects.filter(pk = phishing_page.pk).update(port_number = None,
-                                    site_url = None)
-
-    return redirect('app:phishing_pages')
 
 @login_required
 def delete_phishing_page(request, pk):
     phishing_page = PhishingPage.objects.get(pk = pk)
 
     if request.method == 'POST':
-        if phishing_page.server_status == True:
-            try:
-                # Get details of server of this phishing page
-                global server_list
-                server = server_list[phishing_page.name]['server']
-
-                # Stop the server
-                server.shutdown()
-                server.server_close()
-
-                # Delete entry from database
-                PhishingPage.objects.get(pk = phishing_page.pk).delete()
-
-                # Delete folder from phishing_templates
-                shutil.rmtree(phishing_page.template_dir)
-            except KeyError:
-                pass
-        else:
-            PhishingPage.objects.get(pk = phishing_page.pk).delete()
-
-            # Delete folder from phishing_templates
-            shutil.rmtree(phishing_page.template_dir)
+        # Delete entry from database
+        PhishingPage.objects.get(pk = phishing_page.pk).delete()
 
         return redirect('app:phishing_pages')
 
@@ -474,12 +275,15 @@ def add_campaign(request):
         campaign_name = form.cleaned_data['name']
         from_email = form.cleaned_data['from_email']
         target_group = form.cleaned_data['target_group']
+        phishing_page = form.cleaned_data['phishing_page']
         email_template = form.cleaned_data['email_template']
         sending_profile = form.cleaned_data['sending_profile']
         redirect_url = form.cleaned_data['redirect_url']
 
         # Task to send Email using the selected email template to the target groups using the sending profile
-        async_task('app.tasks.launch_campaign', campaign_name, from_email, target_group, email_template, sending_profile)
+        async_task('app.tasks.launch_campaign', campaign_name,
+        from_email, target_group, phishing_page,
+        email_template, sending_profile)
 
         return redirect('app:home')
 
@@ -502,11 +306,18 @@ def track_email(request, campaign_id, target_id):
 
     CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(email_open_status = True)
 
-    return HttpResponse('Phished!')
+    return HttpResponse('Email Opened!')
 
-def track_link(request, campaign_id, target_id):
-    campaign = Campaign.objects.get(id = campaign_id)
-    target = Target.objects.get(id = target_id)
+# API End Point to know from FastAPI phsihing app that link has been clicked
+@csrf_exempt
+def track_link(request):
+    # Get CID and TID from FastAPI Phishing App
+    cid = request.POST.get("cid")
+    tid = request.POST.get("tid")
+
+    # Update DB that the link is clicked
+    campaign = Campaign.objects.get(id = cid)
+    target = Target.objects.get(id = tid)
 
     CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(link_clicked_status = True)
 
@@ -514,8 +325,23 @@ def track_link(request, campaign_id, target_id):
     # So, when the person click on the link, we will assume that the person has opened the email
     CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(email_open_status = True)
 
-    phishing_url = campaign.phishing_page.site_url + "/?cid=" + campaign_id + "&tid=" + target_id + ""
-    return redirect(phishing_url)
+    return HttpResponse('Phishing Link Clicked!')
+
+# API End Point to know from FastAPI phishing app that data has been submitted
+# API End Point to know the submitted data
+@csrf_exempt
+def track_data(request):
+    # Get CID, TID & submitted data from FastAPI Phishing App
+    cid = request.POST.get("cid")
+    tid = request.POST.get("tid")
+    submitted_data = request.POST.get("submitted_data")
+
+    # Update DB that the data is submitted and enter the submitted data
+    campaign = Campaign.objects.get(id = cid)
+    target = Target.objects.get(id = tid)
+    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True, data_submitted = submitted_data)
+
+    return HttpResponse('Data Submitted!')
 
 @login_required
 def campaign_details(request, pk):

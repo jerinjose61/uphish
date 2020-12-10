@@ -9,7 +9,7 @@ import smtplib
 with open(str(BASE_DIR)+'/settings.json',"r") as infile:
     settings_dict = json.loads(infile.read())
 
-def launch_campaign(campaign_name, from_email, target_group, email_template, sending_profile):
+def launch_campaign(campaign_name, from_email, target_group, phishing_page, email_template, sending_profile):
     smtp_server = sending_profile.smtp_server
     smtp_port = sending_profile.smtp_port
     email = sending_profile.email
@@ -19,6 +19,7 @@ def launch_campaign(campaign_name, from_email, target_group, email_template, sen
                      password=password, use_tls=use_tls)
 
     host = settings_dict['HOST']
+    phishing_url = phishing_page.phishing_url
 
     subject = email_template.subject
     targets = list(Target.objects.filter(target_group = target_group))
@@ -27,9 +28,11 @@ def launch_campaign(campaign_name, from_email, target_group, email_template, sen
 
     for target in targets:
         email_html_file_name = email_template.name + ".html"
-        html_message = render_to_string(email_html_file_name, context={'host':host,
-                                                                        'campaign_id':campaign.id,
-                                                                        'target_id':target.id})
+        html_message = render_to_string(email_html_file_name, context={
+                        'host':host,
+                        'phishing_url':phishing_url,
+                        'campaign_id':campaign.id,
+                        'target_id':target.id})
 
         try:
             email = EmailMessage(subject = subject, body = html_message, from_email = from_email,
