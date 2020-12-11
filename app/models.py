@@ -1,5 +1,6 @@
 from django.db import models
 from ckeditor.fields import RichTextField
+from django_cryptography.fields import encrypt
 # Create your models here.
 
 class SendingProfile(models.Model):
@@ -65,7 +66,7 @@ class CampaignResult(models.Model):
     email_open_status = models.BooleanField(null = True)
     link_clicked_status = models.BooleanField(null = True)
     data_submitted_status = models.BooleanField(null = True)
-    data_submitted = models.TextField(null = True)
+    data_submitted = encrypt(models.TextField(null = True))
     reported = models.BooleanField(null = True)
 
     def __str__(self):
