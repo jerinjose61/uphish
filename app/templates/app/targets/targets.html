@@ -10,10 +10,15 @@
     <div class="card-header">
       <h5 style="display:inline-block"><strong>Targets - {{ target_group }}</strong></h5>
       <a class="btn btn-danger float-right" href="{% url 'app:target_groups' %}">X</a>
-      <a class="btn btn-info float-right mr-2"href="{% url 'app:add_target' pk=target_group.pk %}">
+      <a class="btn btn-info float-right mr-2" href="{% url 'app:add_target' pk=target_group.pk %}">
         <i class="fas fa-plus"></i>
         Add
       </a>
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary float-right mr-2" data-toggle="modal" data-target="#exampleModal">
+        <i class="fas fa-upload"></i>
+        Upload
+      </button>
     </div>
 
     <div class="card-body">
@@ -44,6 +49,30 @@
           {% endfor %}
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Upload Targets</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form action="{% url 'app:targets' pk=target_group.pk %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="file" name="csv_file" id="csv_file" required="True">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>

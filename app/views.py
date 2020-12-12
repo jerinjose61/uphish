@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from app.models import SendingProfile, TargetGroup, Target, PhishingPage, EmailTemplate, Campaign, CampaignResult
 from app import forms
-import requests, os, socketserver, threading, random, socket, time, shutil, re, ssl, json, ast
-from uphish.settings import BASE_DIR, PHISHING_EMAIL_DIR, PHISHING_TEMPLATES_DIR
+import requests, os, re, json, ast, csv
+from uphish.settings import BASE_DIR, PHISHING_EMAIL_DIR
 from pathlib import Path
 from http.server import SimpleHTTPRequestHandler, BaseHTTPRequestHandler
 from django_q.tasks import async_task, result
@@ -101,7 +101,30 @@ def delete_target_group(request, pk):
 def targets(request, pk):
     target_group = TargetGroup.objects.get(pk = pk)
     targets = Target.objects.filter(target_group = target_group)
-    return render(request, 'app/targets/targets.html', {'target_group':target_group, 'targets':targets})
+
+    if request.method == "GET":
+        return render(request, 'app/targets/targets.html', {'target_group':target_group, 'targets':targets})
+    elif request.method == "POST":
+        csv_file = request.FILES['csv_file']
+
+        # Read file data
+        file_data = csv_file.read().decode('UTF-8')
+
+        # Split entire file data into lines
+        lines = file_data.split("\n")
+
+        # Loop over the lines
+        for line in lines:
+            # Split the line with "," as the delimiter. You will get a list of fields
+            fields = line.split(",")
+
+            target = Target.objects.create(first_name = fields[0],
+                                            last_name = fields[1],
+                                            email =  fields[2],
+                                            designation = fields[3],
+                                            target_group = target_group)
+
+        return redirect('app:targets', pk=pk)
 
 @login_required
 def add_target(request, pk):
