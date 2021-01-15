@@ -20,7 +20,6 @@
         <thead>
           <th>Name</th>
           <th class="text-center">Phishing URL</th>
-          <th class="text-center">Use TLS</th>
           <th class="text-center">Actions</th>
         </thead>
         <tbody>
@@ -28,7 +27,6 @@
           <tr>
             <td>{{ phishing_page.name }}</td>
             <td class="text-center">{{ phishing_page.phishing_url }}</td>
-            <td class="text-center">{{ phishing_page.use_tls }}</td>
             <td class="text-center">
               <a title="Delete" class="btn btn-danger" href="{% url 'app:delete_phishing_page' pk=phishing_page.pk %}"><i class="fas fa-trash-alt"></i></a>
             </td>

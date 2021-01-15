@@ -33,7 +33,6 @@ class Target(models.Model):
 class PhishingPage(models.Model):
     name = models.CharField(max_length = 1000)
     phishing_url = models.CharField(max_length = 1000)
-    use_tls = models.BooleanField(null = True)
 
     def __str__(self):
         return self.name
@@ -54,7 +53,6 @@ class Campaign(models.Model):
     phishing_page = models.ForeignKey(PhishingPage, on_delete = models.CASCADE)
     email_template = models.ForeignKey(EmailTemplate, on_delete = models.CASCADE)
     sending_profile = models.ForeignKey(SendingProfile, on_delete = models.CASCADE)
-    redirect_url = models.CharField(max_length = 1000)
 
     def __str__(self):
         return self.name

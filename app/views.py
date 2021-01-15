@@ -214,12 +214,12 @@ def add_email_template(request):
             email_html_file.close()
 
             if ast.literal_eval(settings_dict['USE_TLS']) == True:
-                # Append the string for image tracker in html file
+                # Append the string for image tracker in html file (HTTPS)
                 image_tracker_string = ("\n\n<img src=" +
                                         "\'https://{{ host }}/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
                                         "height=1px width=1px>")
             else:
-                # Append the string for image tracker in html file
+                # Append the string for image tracker in html file (HTTP)
                 image_tracker_string = ("\n\n<img src=" +
                                         "\'http://{{ host }}/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
                                         "height=1px width=1px>")
@@ -252,12 +252,12 @@ def edit_email_template(request, pk):
             email_html_file.close()
 
             if ast.literal_eval(settings_dict['USE_TLS']) == True:
-                # Append the string for image tracker in html file
+                # Append the string for image tracker in html file (HTTPS)
                 image_tracker_string = ("\n\n<img src=" +
                                         "\'https://{{ host }}/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
                                         "height=1px width=1px>")
             else:
-                # Append the string for image tracker in html file
+                # Append the string for image tracker in html file (HTTP)
                 image_tracker_string = ("\n\n<img src=" +
                                         "\'http://{{ host }}/track_email/{{ campaign_id }}/{{ target_id }}/\'" +
                                         "height=1px width=1px>")
@@ -323,49 +323,6 @@ def delete_campaign(request, pk):
 
     return render(request, 'app/campaigns/delete_campaign.html', {'campaign':campaign})
 
-def track_email(request, campaign_id, target_id):
-    campaign = Campaign.objects.get(id = campaign_id)
-    target = Target.objects.get(id = target_id)
-
-    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(email_open_status = True)
-
-    return HttpResponse('Email Opened!')
-
-# API End Point to know from FastAPI phsihing app that link has been clicked
-@csrf_exempt
-def track_link(request):
-    # Get CID and TID from FastAPI Phishing App
-    cid = request.POST.get("cid")
-    tid = request.POST.get("tid")
-
-    # Update DB that the link is clicked
-    campaign = Campaign.objects.get(id = cid)
-    target = Target.objects.get(id = tid)
-
-    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(link_clicked_status = True)
-
-    # In some cases, the tracker image may not be automatically loaded by email clients
-    # So, when the person click on the link, we will assume that the person has opened the email
-    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(email_open_status = True)
-
-    return HttpResponse('Phishing Link Clicked!')
-
-# API End Point to know from FastAPI phishing app that data has been submitted
-# API End Point to know the submitted data
-@csrf_exempt
-def track_data(request):
-    # Get CID, TID & submitted data from FastAPI Phishing App
-    cid = request.POST.get("cid")
-    tid = request.POST.get("tid")
-    submitted_data = request.POST.get("submitted_data")
-
-    # Update DB that the data is submitted and enter the submitted data
-    campaign = Campaign.objects.get(id = cid)
-    target = Target.objects.get(id = tid)
-    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True, data_submitted = submitted_data)
-
-    return HttpResponse('Data Submitted!')
-
 @login_required
 def campaign_details(request, pk):
     campaign = Campaign.objects.get(pk = pk)
@@ -408,3 +365,47 @@ def target_reported(request, campaign_id, target_id):
         CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(reported = False)
 
     return redirect('app:target_phish_details', campaign.id, target.id)
+
+# Function to track if email was opened
+def track_email(request, campaign_id, target_id):
+    campaign = Campaign.objects.get(id = campaign_id)
+    target = Target.objects.get(id = target_id)
+
+    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(email_open_status = True)
+
+    return HttpResponse('Email Opened!')
+
+# API End Point to know from FastAPI phsihing app that link has been clicked
+@csrf_exempt
+def track_link(request):
+    # Get CID and TID from FastAPI Phishing App
+    cid = request.POST.get("cid")
+    tid = request.POST.get("tid")
+
+    # Update DB that the link is clicked
+    campaign = Campaign.objects.get(id = cid)
+    target = Target.objects.get(id = tid)
+
+    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(link_clicked_status = True)
+
+    # In some cases, the tracker image may not be automatically loaded by email clients
+    # So, when the person click on the link, we will assume that the person has opened the email
+    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(email_open_status = True)
+
+    return HttpResponse('Phishing Link Clicked!')
+
+# API End Point to know from FastAPI phishing app that data has been submitted
+# API End Point to know the submitted data
+@csrf_exempt
+def track_data(request):
+    # Get CID, TID & submitted data from FastAPI Phishing App
+    cid = request.POST.get("cid")
+    tid = request.POST.get("tid")
+    submitted_data = request.POST.get("submitted_data")
+
+    # Update DB that the data is submitted and enter the submitted data
+    campaign = Campaign.objects.get(id = cid)
+    target = Target.objects.get(id = tid)
+    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True, data_submitted = submitted_data)
+
+    return HttpResponse('Data Submitted!')

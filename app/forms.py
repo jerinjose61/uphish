@@ -30,7 +30,6 @@ class TargetForm(forms.ModelForm):
 class PhishingPageForm(forms.ModelForm):
     phishing_url = forms.CharField(label="Phishing URL (Without http / https)",
                                     widget=forms.TextInput(attrs={'placeholder':'www.example.com'}))
-    use_tls = forms.BooleanField(label="Use TLS?", required=False)
 
     class Meta:
         model = PhishingPage
@@ -53,5 +52,4 @@ class CampaignForm(forms.ModelForm):
             "phishing_page": "Phishing Page",
             "email_template": "Email Template",
             "sending_profile": "Sending Profile",
-            "redirect_url": "Redirect URL"
         }
