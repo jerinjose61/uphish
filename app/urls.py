@@ -26,10 +26,11 @@ urlpatterns = [
     path('delete_email_template/<slug:pk>/', views.delete_email_template, name = 'delete_email_template'),
     path('add_campaign/', views.add_campaign, name = 'add_campaign'),
     path('delete_campaign/<slug:pk>/', views.delete_campaign, name = 'delete_campaign'),
-    path('track_email/<slug:campaign_id>/<slug:target_id>/', views.track_email, name = 'track_email'),
+    path('track_email/<slug:encrypted_campaign_id>/<slug:encrypted_target_id>/', views.track_email, name = 'track_email'),
     path('track_link/', views.track_link, name='track_link'),
     path('track_data/', views.track_data, name='track_data'),
     path('campaign_details/<slug:pk>/', views.campaign_details, name = 'campaign_details'),
     path('target_phish_details/<slug:campaign_id>/<slug:target_id>/', views.target_phish_details, name = 'target_phish_details'),
     path('target_reported/<slug:campaign_id>/<slug:target_id>/', views.target_reported, name = 'target_reported'),
+    path('download_campaign_report/<slug:pk>/', views.download_campaign_report, name = 'download_campaign_report'),
 ]

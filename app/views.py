@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from app.models import SendingProfile, TargetGroup, Target, PhishingPage, EmailTemplate, Campaign, CampaignResult
 from app import forms
-import requests, os, re, json, ast, csv
+import requests, os, re, json, ast, csv, datetime
 from uphish.settings import BASE_DIR, PHISHING_EMAIL_DIR
 from pathlib import Path
 from http.server import SimpleHTTPRequestHandler, BaseHTTPRequestHandler
@@ -10,6 +10,8 @@ from django.db.models import Q
 from urllib import parse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from app.encryption import generate_key, decrypt
+from django.utils.http import urlsafe_base64_decode
 
 with open(str(BASE_DIR)+'/settings.json',"r") as infile:
     settings_dict = json.loads(infile.read())
@@ -301,7 +303,6 @@ def add_campaign(request):
         phishing_page = form.cleaned_data['phishing_page']
         email_template = form.cleaned_data['email_template']
         sending_profile = form.cleaned_data['sending_profile']
-        redirect_url = form.cleaned_data['redirect_url']
 
         # Task to send Email using the selected email template to the target groups using the sending profile
         async_task('app.tasks.launch_campaign', campaign_name,
@@ -366,8 +367,45 @@ def target_reported(request, campaign_id, target_id):
 
     return redirect('app:target_phish_details', campaign.id, target.id)
 
+# Download Campaign Report
+def download_campaign_report(request, pk):
+    campaign = Campaign.objects.get(pk = pk)
+    campaign_results = CampaignResult.objects.filter(campaign = campaign)
+
+    #Write data to csv
+    currentDT = str(datetime.datetime.now())[0:16]
+    response = HttpResponse(content_type='text/csv')
+    response_string = 'attachment; filename="{} - Phishing Campaign Report - {}.csv"'
+    response['Content-Disposition'] = response_string.format(campaign.name, currentDT)
+
+    writer = csv.writer(response)
+
+    # Writing the report header fields
+    writer.writerow(['Target Name', 'Email ID', 'Designation',
+                    'Sent', 'Opened', 'Clicked', 'Submitted Data', 'Reported'])
+
+    for campaign_result in campaign_results:
+        writer.writerow([campaign_result.target.first_name + ' ' + campaign_result.target.last_name,
+                        campaign_result.target.email, campaign_result.target.designation,
+                        campaign_result.email_sent_status, campaign_result.email_open_status,
+                        campaign_result.link_clicked_status, campaign_result.data_submitted_status,
+                        campaign_result.reported])
+
+    return response
+
 # Function to track if email was opened
-def track_email(request, campaign_id, target_id):
+def track_email(request, encrypted_campaign_id, encrypted_target_id):
+    # # Decode & then decrypt encrypted_campaign_id and encrypted_target_id
+    # First decode & decrypt campaign_id
+    decoded_campaign_id = urlsafe_base64_decode(encrypted_campaign_id)
+
+    key = generate_key()
+    campaign_id = int(decrypt(decoded_campaign_id, key))
+
+    # First decode & decrypt campaign_id (key is same as before)
+    decoded_target_id = urlsafe_base64_decode(encrypted_target_id)
+    target_id = int(decrypt(decoded_target_id, key))
+
     campaign = Campaign.objects.get(id = campaign_id)
     target = Target.objects.get(id = target_id)
 
@@ -379,8 +417,19 @@ def track_email(request, campaign_id, target_id):
 @csrf_exempt
 def track_link(request):
     # Get CID and TID from FastAPI Phishing App
-    cid = request.POST.get("cid")
-    tid = request.POST.get("tid")
+    encrypted_cid = request.POST.get("cid")
+    encrypted_tid = request.POST.get("tid")
+
+    # # Decode & then decrypt encrypted_cid and encrypted_tid
+    # First decode & decrypt campaign_id
+    decoded_cid = urlsafe_base64_decode(encrypted_cid)
+
+    key = generate_key()
+    cid = int(decrypt(decoded_cid, key))
+
+    # First decode & decrypt campaign_id (key is same as before)
+    decoded_tid = urlsafe_base64_decode(encrypted_tid)
+    tid = int(decrypt(decoded_tid, key))
 
     # Update DB that the link is clicked
     campaign = Campaign.objects.get(id = cid)
@@ -399,13 +448,25 @@ def track_link(request):
 @csrf_exempt
 def track_data(request):
     # Get CID, TID & submitted data from FastAPI Phishing App
-    cid = request.POST.get("cid")
-    tid = request.POST.get("tid")
+    encrypted_cid = request.POST.get("cid")
+    encrypted_tid = request.POST.get("tid")
     submitted_data = request.POST.get("submitted_data")
+
+    # # Decode & then decrypt encrypted_cid and encrypted_tid
+    # First decode & decrypt campaign_id
+    decoded_cid = urlsafe_base64_decode(encrypted_cid)
+
+    key = generate_key()
+    cid = int(decrypt(decoded_cid, key))
+
+    # First decode & decrypt campaign_id (key is same as before)
+    decoded_tid = urlsafe_base64_decode(encrypted_tid)
+    tid = int(decrypt(decoded_tid, key))
 
     # Update DB that the data is submitted and enter the submitted data
     campaign = Campaign.objects.get(id = cid)
     target = Target.objects.get(id = tid)
+
     CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True, data_submitted = submitted_data)
 
     return HttpResponse('Data Submitted!')

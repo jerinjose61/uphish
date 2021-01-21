@@ -2,9 +2,10 @@ from app.models import Target, Campaign, CampaignResult
 from django.template.loader import render_to_string
 from django.core.mail.backends.smtp import EmailBackend
 from django.core.mail import EmailMessage, send_mail
-import os, socket, json
-from uphish.settings import PHISHING_EMAIL_DIR, MEDIA_ROOT, BASE_DIR
-import smtplib
+import os, socket, json, smtplib
+from uphish.settings import MEDIA_ROOT, BASE_DIR
+from app.encryption import generate_key, encrypt
+from django.utils.http import urlsafe_base64_encode
 
 with open(str(BASE_DIR)+'/settings.json',"r") as infile:
     settings_dict = json.loads(infile.read())
@@ -26,13 +27,23 @@ def launch_campaign(campaign_name, from_email, target_group, phishing_page, emai
 
     campaign = Campaign.objects.get(name=campaign_name)
 
+    # Encrypt campaign_id
+    # generate_key() and encrypt() are modules in encryption.py
+    key = generate_key()
+    encrypted_campaign_id = encrypt(str(campaign.id).encode(), key)
+    campaign_id = urlsafe_base64_encode(encrypted_campaign_id)
+
     for target in targets:
+        # Encrypt target_id
+        encrypted_target_id = encrypt(str(target.id).encode(), key)
+        target_id = urlsafe_base64_encode(encrypted_target_id)
+
         email_html_file_name = email_template.name + ".html"
         html_message = render_to_string(email_html_file_name, context={
                         'host':host,
                         'phishing_url':phishing_url,
-                        'campaign_id':campaign.id,
-                        'target_id':target.id})
+                        'campaign_id':campaign_id,
+                        'target_id':target_id})
 
         try:
             email = EmailMessage(subject = subject, body = html_message, from_email = from_email,

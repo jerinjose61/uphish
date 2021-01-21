@@ -60,12 +60,12 @@ class Campaign(models.Model):
 class CampaignResult(models.Model):
     campaign = models.ForeignKey(Campaign, on_delete = models.CASCADE)
     target = models.ForeignKey(Target, on_delete = models.CASCADE)
-    email_sent_status = models.BooleanField(null = True)
-    email_open_status = models.BooleanField(null = True)
-    link_clicked_status = models.BooleanField(null = True)
-    data_submitted_status = models.BooleanField(null = True)
+    email_sent_status = models.BooleanField(null = True, default=False)
+    email_open_status = models.BooleanField(null = True, default=False)
+    link_clicked_status = models.BooleanField(null = True, default=False)
+    data_submitted_status = models.BooleanField(null = True, default=False)
     data_submitted = encrypt(models.TextField(null = True))
-    reported = models.BooleanField(null = True)
+    reported = models.BooleanField(null = True, default=False)
 
     def __str__(self):
         return str(self.campaign)
