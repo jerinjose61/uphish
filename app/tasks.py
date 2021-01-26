@@ -6,6 +6,7 @@ import os, socket, json, smtplib
 from uphish.settings import MEDIA_ROOT, BASE_DIR
 from app.encryption import generate_key, encrypt
 from django.utils.http import urlsafe_base64_encode
+from datetime import datetime
 
 with open(str(BASE_DIR)+'/settings.json',"r") as infile:
     settings_dict = json.loads(infile.read())
@@ -55,7 +56,7 @@ def launch_campaign(campaign_name, from_email, target_group, phishing_page, emai
             email.content_subtype = 'html'
             email.send()
             CampaignResult.objects.create(campaign = campaign, target = target,
-                                            email_sent_status = True)
+                                            email_sent_status = True, email_sent_time = datetime.now())
         except smtplib.SMTPException:
             CampaignResult.objects.create(campaign = campaign, target = target,
                                             email_sent_status = False)

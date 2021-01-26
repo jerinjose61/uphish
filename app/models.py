@@ -61,6 +61,7 @@ class CampaignResult(models.Model):
     campaign = models.ForeignKey(Campaign, on_delete = models.CASCADE)
     target = models.ForeignKey(Target, on_delete = models.CASCADE)
     email_sent_status = models.BooleanField(null = True, default=False)
+    email_sent_time = models.DateTimeField(null = True)
     email_open_status = models.BooleanField(null = True, default=False)
     link_clicked_status = models.BooleanField(null = True, default=False)
     data_submitted_status = models.BooleanField(null = True, default=False)
@@ -69,3 +70,23 @@ class CampaignResult(models.Model):
 
     def __str__(self):
         return str(self.campaign)
+
+class EmailOpenTimeLog(models.Model):
+    campaign = models.ForeignKey(Campaign, on_delete = models.CASCADE)
+    target = models.ForeignKey(Target, on_delete = models.CASCADE)
+    email_open_time = models.DateTimeField()
+
+class LinkClickTimeLog(models.Model):
+    campaign = models.ForeignKey(Campaign, on_delete = models.CASCADE)
+    target = models.ForeignKey(Target, on_delete = models.CASCADE)
+    link_click_time = models.DateTimeField()
+
+class DataSubmitTimeLog(models.Model):
+    campaign = models.ForeignKey(Campaign, on_delete = models.CASCADE)
+    target = models.ForeignKey(Target, on_delete = models.CASCADE)
+    data_submit_time = models.DateTimeField()
+
+class ReportTimeLog(models.Model):
+    campaign = models.ForeignKey(Campaign, on_delete = models.CASCADE)
+    target = models.ForeignKey(Target, on_delete = models.CASCADE)
+    report_time = models.DateTimeField()

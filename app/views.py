@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
-from app.models import SendingProfile, TargetGroup, Target, PhishingPage, EmailTemplate, Campaign, CampaignResult
+from app.models import (SendingProfile, TargetGroup, Target, PhishingPage,
+                        EmailTemplate, Campaign, CampaignResult,
+                        EmailOpenTimeLog, LinkClickTimeLog, DataSubmitTimeLog, ReportTimeLog)
 from app import forms
 import requests, os, re, json, ast, csv, datetime
 from uphish.settings import BASE_DIR, PHISHING_EMAIL_DIR
@@ -12,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from app.encryption import generate_key, decrypt
 from django.utils.http import urlsafe_base64_decode
+from datetime import datetime
 
 with open(str(BASE_DIR)+'/settings.json',"r") as infile:
     settings_dict = json.loads(infile.read())
@@ -350,8 +353,14 @@ def target_phish_details(request, campaign_id, target_id):
     target = Target.objects.get(pk = target_id)
 
     target_details = CampaignResult.objects.get(Q(campaign = campaign) & Q(target = target))
+    email_open_times = EmailOpenTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
+    link_click_times = LinkClickTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
+    data_submit_times = DataSubmitTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
+    report_times = ReportTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
 
-    return render(request, 'app/campaigns/target_phish_details.html', {'target':target_details})
+    return render(request, 'app/campaigns/target_phish_details.html', {'target':target_details,
+                    'email_open_times':email_open_times, 'link_click_times':link_click_times,
+                    'data_submit_times':data_submit_times, 'report_times':report_times})
 
 @login_required
 def target_reported(request, campaign_id, target_id):
@@ -362,6 +371,7 @@ def target_reported(request, campaign_id, target_id):
 
     if (target_details.reported == False) or (target_details.reported == None):
         CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(reported = True)
+        ReportTimeLog.objects.create(campaign = campaign, target = target, report_time = datetime.now())
     else:
         CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(reported = False)
 
@@ -410,6 +420,8 @@ def track_email(request, encrypted_campaign_id, encrypted_target_id):
     target = Target.objects.get(id = target_id)
 
     CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(email_open_status = True)
+    EmailOpenTimeLog.objects.create(campaign = campaign, target = target,
+                                    email_open_time = datetime.now())
 
     return HttpResponse('Email Opened!')
 
@@ -441,6 +453,9 @@ def track_link(request):
     # So, when the person click on the link, we will assume that the person has opened the email
     CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(email_open_status = True)
 
+    LinkClickTimeLog.objects.create(campaign = campaign, target = target,
+                                    link_click_time = datetime.now())
+
     return HttpResponse('Phishing Link Clicked!')
 
 # API End Point to know from FastAPI phishing app that data has been submitted
@@ -468,5 +483,8 @@ def track_data(request):
     target = Target.objects.get(id = tid)
 
     CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True, data_submitted = submitted_data)
+
+    DataSubmitTimeLog.objects.create(campaign = campaign, target = target,
+                                    data_submit_time = datetime.now())
 
     return HttpResponse('Data Submitted!')

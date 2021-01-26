@@ -21,7 +21,6 @@
         Mark As Not Reported
       </a>
       {% endif %}
-
     </div>
 
     <div class="card-body">
@@ -76,11 +75,61 @@
             </td>
           </tr>
           <tr>
-            <td>Submitted Data</td>
+            <td>Latest Submitted Data</td>
             <td>{{ target.data_submitted }}</td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5>Time Logs</h5>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td>Sent</td>
+            <td>{{ target.email_sent_time }}</td>
+          </tr>
+          <tr>
+            <td>Opened</td>
+            <td>
+              {% for email_open_time in email_open_times %}
+                {{ email_open_time.email_open_time }}
+                <br>
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td>Clicked</td>
+            <td>
+              {% for link_click_time in link_click_times %}
+                {{ link_click_time.link_click_time }}
+                <br>
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td>Data Submitted</td>
+            <td>
+              {% for data_submit_time in data_submit_times %}
+                {{ data_submit_time.data_submit_time }}
+                <br>
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td>Reported</td>
+            <td>
+              {% for report_time in report_times %}
+                {{ report_time.report_time }}
+                <br>
+              {% endfor %}
+            </td>
+          </tr>
+        </tbody>
     </div>
   </div>
 </div>
