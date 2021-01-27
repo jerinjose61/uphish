@@ -3,7 +3,7 @@ from app.models import SendingProfile, TargetGroup, Target, PhishingPage, EmailT
 
 class SendingProfileForm(forms.ModelForm):
     name = forms.CharField(label='Name')
-    email = forms.EmailField(label="Email ID")
+    username = forms.CharField(label="Username")
     password = forms.CharField(label="Password")
     smtp_server = forms.CharField(label="SMTP Server")
     smtp_port = forms.IntegerField(label="SMTP Port")

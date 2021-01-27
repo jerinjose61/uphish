@@ -14,10 +14,10 @@ with open(str(BASE_DIR)+'/settings.json',"r") as infile:
 def launch_campaign(campaign_name, from_email, target_group, phishing_page, email_template, sending_profile):
     smtp_server = sending_profile.smtp_server
     smtp_port = sending_profile.smtp_port
-    email = sending_profile.email
+    username = sending_profile.username
     password = sending_profile.password
     use_tls = sending_profile.use_tls
-    email_backend = EmailBackend(host=smtp_server, port=smtp_port, username=email,
+    email_backend = EmailBackend(host=smtp_server, port=smtp_port, username=username,
                      password=password, use_tls=use_tls)
 
     host = settings_dict['HOST']
