@@ -3,7 +3,7 @@ from app.models import (SendingProfile, TargetGroup, Target, PhishingPage,
                         EmailTemplate, Campaign, CampaignResult,
                         EmailOpenTimeLog, LinkClickTimeLog, DataSubmitTimeLog, ReportTimeLog)
 from app import forms
-import requests, os, re, json, ast, csv, datetime
+import requests, os, re, json, ast, csv
 from uphish.settings import BASE_DIR, PHISHING_EMAIL_DIR
 from pathlib import Path
 from http.server import SimpleHTTPRequestHandler, BaseHTTPRequestHandler
@@ -383,7 +383,7 @@ def download_campaign_report(request, pk):
     campaign_results = CampaignResult.objects.filter(campaign = campaign)
 
     #Write data to csv
-    currentDT = str(datetime.datetime.now())[0:16]
+    currentDT = str(datetime.now())[0:16]
     response = HttpResponse(content_type='text/csv')
     response_string = 'attachment; filename="{} - Phishing Campaign Report - {}.csv"'
     response['Content-Disposition'] = response_string.format(campaign.name, currentDT)
