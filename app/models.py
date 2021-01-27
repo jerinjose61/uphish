@@ -5,7 +5,7 @@ from django_cryptography.fields import encrypt
 
 class SendingProfile(models.Model):
     name = models.CharField(max_length = 1000)
-    username = models.CharField(max_length = 2000)
+    username = models.CharField(max_length = 2000, null = True)
     password = models.CharField(max_length = 1000)
     smtp_server = models.CharField(max_length = 1000)
     smtp_port = models.IntegerField()

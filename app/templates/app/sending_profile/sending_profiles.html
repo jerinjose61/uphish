@@ -19,7 +19,7 @@
       <table id="table" class="table">
         <thead>
           <th>Name</th>
-          <th>Email</th>
+          <th>Username</th>
           <th>SMTP Server</th>
           <th>Port</th>
           <th class="text-center">Actions</th>
@@ -28,7 +28,7 @@
           {% for sending_profile in sending_profiles %}
           <tr>
             <td>{{ sending_profile.name }}</td>
-            <td>{{ sending_profile.email }}</td>
+            <td>{{ sending_profile.username }}</td>
             <td>{{ sending_profile.smtp_server }}</td>
             <td>{{ sending_profile.smtp_port }}</td>
             <td class="text-center">
