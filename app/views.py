@@ -392,13 +392,27 @@ def download_campaign_report(request, pk):
 
     # Writing the report header fields
     writer.writerow(['Target Name', 'Email ID', 'Designation',
-                    'Sent', 'Opened', 'Clicked', 'Submitted Data', 'Reported'])
+                    'Sent', 'Sent Time',
+                    'Opened', 'Open Count',
+                    'Clicked', 'Click Count',
+                    'Submitted Data', 'Submitted Data Value',
+                    'Reported'])
 
     for campaign_result in campaign_results:
+        # Open Count
+        email_open_time_logs = EmailOpenTimeLog.objects.filter(campaign = campaign, target=campaign_result.target)
+        email_open_count = email_open_time_logs.count()
+
+        # Click Count
+        link_click_time_logs = LinkClickTimeLog.objects.filter(campaign = campaign, target=campaign_result.target)
+        link_click_count = link_click_time_logs.count()
+
         writer.writerow([campaign_result.target.first_name + ' ' + campaign_result.target.last_name,
                         campaign_result.target.email, campaign_result.target.designation,
-                        campaign_result.email_sent_status, campaign_result.email_open_status,
-                        campaign_result.link_clicked_status, campaign_result.data_submitted_status,
+                        campaign_result.email_sent_status, campaign_result.email_sent_time,
+                        campaign_result.email_open_status, email_open_count,
+                        campaign_result.link_clicked_status, link_click_count,
+                        campaign_result.data_submitted_status, campaign_result.data_submitted,
                         campaign_result.reported])
 
     return response
