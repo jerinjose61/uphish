@@ -65,7 +65,6 @@ class CampaignResult(models.Model):
     email_open_status = models.BooleanField(null = True, default=False)
     link_clicked_status = models.BooleanField(null = True, default=False)
     data_submitted_status = models.BooleanField(null = True, default=False)
-    data_submitted = encrypt(models.TextField(null = True))
     reported = models.BooleanField(null = True, default=False)
 
     def __str__(self):
@@ -81,9 +80,10 @@ class LinkClickTimeLog(models.Model):
     target = models.ForeignKey(Target, on_delete = models.CASCADE)
     link_click_time = models.DateTimeField()
 
-class DataSubmitTimeLog(models.Model):
+class DataSubmitted(models.Model):
     campaign = models.ForeignKey(Campaign, on_delete = models.CASCADE)
     target = models.ForeignKey(Target, on_delete = models.CASCADE)
+    data_submitted = encrypt(models.TextField(null = True))
     data_submit_time = models.DateTimeField()
 
 class ReportTimeLog(models.Model):

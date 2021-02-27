@@ -9,15 +9,15 @@
   <div class="card">
     <div class="card-header">
       <h5 style="display:inline-block"><strong>{{ target.target.first_name }} {{ target.target.last_name }}</strong></h5>
-      <a class="btn btn-danger float-right" href="{% url 'app:campaign_details' pk=target.campaign.id %}">X</a>
+      <a class="btn btn-danger float-right" href="{% url 'app:filter' pk=target.campaign.id %}">X</a>
       {% if target.reported == False or target.reported == None %}
       <a class="btn btn-info float-right mr-4"
-        href="{% url 'app:target_reported' campaign_id=target.campaign.id target_id=target.target.id %}">
+        href="{% url 'app:target_reported_from_filter' campaign_id=target.campaign.id target_id=target.target.id %}">
         Mark As Reported
       </a>
       {% else %}
       <a class="btn btn-danger float-right mr-4"
-        href="{% url 'app:target_reported' campaign_id=target.campaign.id target_id=target.target.id %}">
+        href="{% url 'app:target_reported_from_filter' campaign_id=target.campaign.id target_id=target.target.id %}">
         Mark As Not Reported
       </a>
       {% endif %}

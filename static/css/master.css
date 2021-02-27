@@ -1,4 +1,7 @@
 body{
   font-family: 'Nunito', sans-serif;
-  background-color: #f8ffff;
+}
+
+.card-hover:hover{
+  transform: scale(1.05);
 }

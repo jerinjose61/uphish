@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from app.models import (SendingProfile, TargetGroup, Target, PhishingPage,
                         EmailTemplate, Campaign, CampaignResult,
-                        EmailOpenTimeLog, LinkClickTimeLog, DataSubmitTimeLog, ReportTimeLog)
+                        EmailOpenTimeLog, LinkClickTimeLog, DataSubmitted, ReportTimeLog)
 from app import forms
 import requests, os, re, json, ast, csv
 from uphish.settings import BASE_DIR, PHISHING_EMAIL_DIR
@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from app.encryption import generate_key, decrypt
 from django.utils.http import urlsafe_base64_decode
 from datetime import datetime
+from app.filters import CampaignResultFilter
 
 with open(str(BASE_DIR)+'/settings.json',"r") as infile:
     settings_dict = json.loads(infile.read())
@@ -346,6 +347,93 @@ def campaign_details(request, pk):
                                                                     'click_count':click_count,
                                                                     'data_count':data_count,
                                                                     'reported_count':reported_count})
+@login_required
+def campaign_targets(request, pk):
+    campaign = Campaign.objects.get(pk=pk)
+    targets = Target.objects.filter(target_group = campaign.target_group)
+
+    return render(request, 'app/campaigns/campaign_targets.html',
+                    {"campaign":campaign, "targets":targets})
+
+@login_required
+def campaign_targets_sent(request, pk):
+    campaign = Campaign.objects.get(pk=pk)
+    targets_sent = CampaignResult.objects.filter(Q(campaign = campaign) &
+                    Q(email_sent_status = True))
+
+    return render(request, 'app/campaigns/campaign_targets_sent.html',
+                    {"campaign":campaign, "targets_sent":targets_sent})
+
+@login_required
+def campaign_targets_opened(request, pk):
+    campaign = Campaign.objects.get(pk=pk)
+    targets_opened = CampaignResult.objects.filter(Q(campaign = campaign) &
+                    Q(email_open_status = True))
+
+    targets_open_details = {}
+
+    for target in targets_opened:
+        target_open_time = EmailOpenTimeLog.objects.filter(Q(campaign = campaign)
+                            & Q(target = target.target))
+
+        targets_open_details[target.target]  = target_open_time
+
+    return render(request, 'app/campaigns/campaign_targets_opened.html',
+                    {"campaign":campaign, "targets_open_details":targets_open_details})
+
+@login_required
+def campaign_targets_clicked(request, pk):
+    campaign = Campaign.objects.get(pk=pk)
+    targets_clicked = CampaignResult.objects.filter(Q(campaign = campaign) &
+                    Q(link_clicked_status = True))
+
+    targets_clicked_details = {}
+
+    for target in targets_clicked:
+        target_click_time = LinkClickTimeLog.objects.filter(Q(campaign = campaign)
+                            & Q(target = target.target))
+
+        targets_clicked_details[target.target]  = target_click_time
+
+    return render(request, 'app/campaigns/campaign_targets_clicked.html',
+                    {"campaign":campaign,
+                    "targets_clicked_details":targets_clicked_details})
+
+@login_required
+def campaign_targets_submitted_data(request, pk):
+    campaign = Campaign.objects.get(pk=pk)
+    targets_submitted_data = CampaignResult.objects.filter(Q(campaign = campaign) &
+                    Q(data_submitted_status = True))
+
+    targets_submitted_data_details = {}
+
+    for target in targets_submitted_data:
+        data_submitted = DataSubmitted.objects.filter(Q(campaign = campaign)
+                            & Q(target = target.target))
+
+        targets_submitted_data_details[target.target]  = data_submitted
+
+    return render(request, 'app/campaigns/campaign_targets_submitted_data.html',
+                    {"campaign":campaign,
+                    "targets_submitted_data_details":targets_submitted_data_details})
+
+@login_required
+def campaign_targets_reported(request, pk):
+    campaign = Campaign.objects.get(pk=pk)
+    targets_reported = CampaignResult.objects.filter(Q(campaign = campaign) &
+                    Q(reported = True))
+
+    targets_reported_details = {}
+
+    for target in targets_reported:
+        target_report_time = ReportTimeLog.objects.filter(Q(campaign = campaign)
+                            & Q(target = target.target))
+
+        targets_reported_details[target.target]  = target_report_time
+
+    return render(request, 'app/campaigns/campaign_targets_reported.html',
+                    {"campaign":campaign,
+                    "targets_reported_details":targets_reported_details})
 
 @login_required
 def target_phish_details(request, campaign_id, target_id):
@@ -355,12 +443,27 @@ def target_phish_details(request, campaign_id, target_id):
     target_details = CampaignResult.objects.get(Q(campaign = campaign) & Q(target = target))
     email_open_times = EmailOpenTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
     link_click_times = LinkClickTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
-    data_submit_times = DataSubmitTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
+    data_submitted = DataSubmitted.objects.filter(Q(campaign = campaign) & Q(target = target))
     report_times = ReportTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
 
     return render(request, 'app/campaigns/target_phish_details.html', {'target':target_details,
                     'email_open_times':email_open_times, 'link_click_times':link_click_times,
-                    'data_submit_times':data_submit_times, 'report_times':report_times})
+                    'data_submitted':data_submitted, 'report_times':report_times})
+
+@login_required
+def target_phish_details_from_filter(request, campaign_id, target_id):
+    campaign = Campaign.objects.get(pk = campaign_id)
+    target = Target.objects.get(pk = target_id)
+
+    target_details = CampaignResult.objects.get(Q(campaign = campaign) & Q(target = target))
+    email_open_times = EmailOpenTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
+    link_click_times = LinkClickTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
+    data_submitted = DataSubmitted.objects.filter(Q(campaign = campaign) & Q(target = target))
+    report_times = ReportTimeLog.objects.filter(Q(campaign = campaign) & Q(target = target))
+
+    return render(request, 'app/campaigns/target_phish_details_from_filter.html', {'target':target_details,
+                    'email_open_times':email_open_times, 'link_click_times':link_click_times,
+                    'data_submitted':data_submitted, 'report_times':report_times})
 
 @login_required
 def target_reported(request, campaign_id, target_id):
@@ -377,7 +480,23 @@ def target_reported(request, campaign_id, target_id):
 
     return redirect('app:target_phish_details', campaign.id, target.id)
 
+@login_required
+def target_reported_from_filter(request, campaign_id, target_id):
+    campaign = Campaign.objects.get(pk = campaign_id)
+    target = Target.objects.get(pk = target_id)
+
+    target_details = CampaignResult.objects.get(Q(campaign = campaign) & Q(target = target))
+
+    if (target_details.reported == False) or (target_details.reported == None):
+        CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(reported = True)
+        ReportTimeLog.objects.create(campaign = campaign, target = target, report_time = datetime.now())
+    else:
+        CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(reported = False)
+
+    return redirect('app:target_phish_details_from_filter', campaign.id, target.id)
+
 # Download Campaign Report
+@login_required
 def download_campaign_report(request, pk):
     campaign = Campaign.objects.get(pk = pk)
     campaign_results = CampaignResult.objects.filter(campaign = campaign)
@@ -393,29 +512,64 @@ def download_campaign_report(request, pk):
     # Writing the report header fields
     writer.writerow(['Target Name', 'Email ID', 'Designation',
                     'Sent', 'Sent Time',
-                    'Opened', 'Open Count',
-                    'Clicked', 'Click Count',
-                    'Submitted Data', 'Submitted Data Value',
-                    'Reported'])
+                    'Opened', 'Open Count', 'Open Time',
+                    'Clicked', 'Click Count', 'Click Time',
+                    'Submitted Data', 'Submitted Data Count', 'Submitted Data Values', 'Submitted Data Time',
+                    'Reported', 'Reported Time'])
 
     for campaign_result in campaign_results:
-        # Open Count
-        email_open_time_logs = EmailOpenTimeLog.objects.filter(campaign = campaign, target=campaign_result.target)
+        # Open Count & Time
+        email_open_time_logs = EmailOpenTimeLog.objects.filter(Q(campaign = campaign) & Q(target=campaign_result.target))
         email_open_count = email_open_time_logs.count()
 
-        # Click Count
-        link_click_time_logs = LinkClickTimeLog.objects.filter(campaign = campaign, target=campaign_result.target)
+        email_open_time = ''
+        for email_open_time_log in email_open_time_logs:
+            email_open_time += str(email_open_time_log.email_open_time) + '\n'
+
+        # Click Count & Time
+        link_click_time_logs = LinkClickTimeLog.objects.filter(Q(campaign = campaign) & Q(target=campaign_result.target))
         link_click_count = link_click_time_logs.count()
+
+        link_click_time = ''
+        for link_click_time_log in link_click_time_logs:
+            link_click_time += str(link_click_time_log.link_click_time) + '\n'
+
+        # Submitted Data Values & Time
+        submitted_data_logs = DataSubmitted.objects.filter(Q(campaign = campaign) & Q(target = campaign_result.target))
+        submitted_data_count = submitted_data_logs.count()
+        submitted_data_values = ''
+        submitted_data_times = ''
+
+        for submitted_data_log in submitted_data_logs:
+            submitted_data_values += submitted_data_log.data_submitted + '\n'
+            submitted_data_times += str(submitted_data_log.data_submit_time) + '\n'
+
+        # Reported Time
+        reported_time_logs = ReportTimeLog.objects.filter(Q(campaign = campaign) & Q(target = campaign_result.target))
+        reported_time = ''
+
+        for reported_time_log in reported_time_logs:
+            reported_time += str(reported_time_log.report_time) + '\n'
 
         writer.writerow([campaign_result.target.first_name + ' ' + campaign_result.target.last_name,
                         campaign_result.target.email, campaign_result.target.designation,
                         campaign_result.email_sent_status, campaign_result.email_sent_time,
-                        campaign_result.email_open_status, email_open_count,
-                        campaign_result.link_clicked_status, link_click_count,
-                        campaign_result.data_submitted_status, campaign_result.data_submitted,
-                        campaign_result.reported])
+                        campaign_result.email_open_status, email_open_count, email_open_time,
+                        campaign_result.link_clicked_status, link_click_count, link_click_time,
+                        campaign_result.data_submitted_status, submitted_data_count, submitted_data_values, submitted_data_times,
+                        campaign_result.reported, reported_time])
 
     return response
+
+# FIlter Campaign Result
+@login_required
+def filter(request, pk):
+    campaign = Campaign.objects.get(pk = pk)
+    campaign_results = CampaignResult.objects.filter(campaign = campaign)
+    campaign_result_filter = CampaignResultFilter(request.GET, queryset = campaign_results)
+
+    return render(request, 'app/campaigns/filter.html', {'filter': campaign_result_filter,
+                    'campaign':campaign})
 
 # Function to track if email was opened
 def track_email(request, encrypted_campaign_id, encrypted_target_id):
@@ -496,9 +650,10 @@ def track_data(request):
     campaign = Campaign.objects.get(id = cid)
     target = Target.objects.get(id = tid)
 
-    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True, data_submitted = submitted_data)
+    CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True)
 
-    DataSubmitTimeLog.objects.create(campaign = campaign, target = target,
+    DataSubmitted.objects.create(campaign = campaign, target = target,
+                                    data_submitted = submitted_data,
                                     data_submit_time = datetime.now())
 
     return HttpResponse('Data Submitted!')

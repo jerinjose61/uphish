@@ -1,0 +1,48 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>{{ campaign.name }} - Link Clicked</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>{{ campaign.name }} - Link Clicked</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:campaign_details' pk=campaign.id %}">X</a>
+    </div>
+    <div class="card-body">
+      <table id="table" class="table">
+        <thead>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Designation</th>
+          <th>Link Click Time</th>
+        </thead>
+        <tbody>
+          {% for target, times in targets_clicked_details.items %}
+          <tr>
+            <td>{{ target.first_name }} {{ target.last_name }}</td>
+            <td>{{ target.email }}</td>
+            <td>{{ target.designation }}</td>
+            <td>
+              {% for time in times %}
+                {{ time.link_click_time }}
+                <br>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#table').DataTable({
+      "ordering": true // false to disable sorting (or any other option)
+    });
+});
+</script>
+{% endblock %}

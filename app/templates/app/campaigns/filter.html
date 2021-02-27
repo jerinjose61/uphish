@@ -1,0 +1,125 @@
+{% extends "app/base.html" %}
+{% load widget_tweaks %}
+
+{% block head %}
+<title>{{ campaign.name }} - Filter</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>{{ campaign.name }} - Filter</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:campaign_details' pk=campaign.id %}">X</a>
+    </div>
+    <div class="card-body">
+      <form method="get">
+        <div class="row">
+          <div class="form-group col-md-4">
+            {{ filter.form.target.label_tag }}
+            {% render_field filter.form.target class="form-control" %}
+          </div>
+          <div class="form-group col-md-4">
+            <label>Email Sent?</label>
+            {% render_field filter.form.email_sent_status class="form-control" %}
+          </div>
+          <div class="form-group col-md-4">
+            <label>Email Opened?</label>
+            {% render_field filter.form.email_open_status class="form-control" %}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-4">
+            <label>Link Clicked?</label>
+            {% render_field filter.form.link_clicked_status class="form-control" %}
+          </div>
+          <div class="form-group col-md-4">
+            <label>Data Submitted?</label>
+            {% render_field filter.form.data_submitted_status class="form-control" %}
+          </div>
+          <div class="form-group col-md-4">
+            <label>Reported?</label>
+            {% render_field filter.form.reported class="form-control" %}
+          </div>
+        </div>
+
+        <button class="btn btn-info" type="submit"><i class="fas fa-search mr-2"></i>Search</button>
+      </form>
+
+      <hr>
+
+      <div class="mt-4">
+        <table id="table" class="table">
+          <thead>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Designation</th>
+            <th>Status</th>
+            <th class="text-center">View Details</th>
+          </thead>
+          <tbody>
+            {% for target in filter.qs %}
+              <tr>
+                <td>{{ target.target.first_name }} {{ target.target.last_name }}</td>
+                <td>{{ target.target.email }}</td>
+                <td>{{ target.target.designation }}</td>
+                <td>
+                  {% if target.email_sent_status == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Sent
+                  <br>
+                  {% elif target.email_sent_status == False or target.email_sent_status == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Sent
+                  <br>
+                  {% endif %}
+                  {% if target.email_open_status == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Opened
+                  <br>
+                  {% elif target.email_open_status == False or target.email_open_status == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Opened
+                  <br>
+                  {% endif %}
+                  {% if target.link_clicked_status == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Clicked
+                  <br>
+                  {% elif target.link_clicked_status == False or target.link_clicked_status == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Clicked
+                  <br>
+                  {% endif %}
+                  {% if target.data_submitted_status == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Submitted Data
+                  <br>
+                  {% elif target.data_submitted_status == False or target.data_submitted_status == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Submitted Data
+                  <br>
+                  {% endif %}
+                  {% if target.reported == True %}
+                  <i class="fas fa-check mr-2 text-success"></i>Reported
+                  <br>
+                  {% elif target.reported == False or target.reported == None %}
+                  <i class="fas fa-times mr-2 text-danger"></i>Not Reported
+                  <br>
+                  {% endif %}
+                <td class="text-center text-white">
+                  <a title="Submitted Data" type="button" class="btn btn-info"
+                  href="{% url 'app:target_phish_details_from_filter' campaign_id=campaign.pk target_id=target.target.pk %}">
+                    <i class="fas fa-search-plus"></i>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#table').DataTable({
+      "ordering": true // false to disable sorting (or any other option)
+    });
+});
+</script>
+{% endblock %}
