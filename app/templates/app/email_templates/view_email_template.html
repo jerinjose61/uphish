@@ -1,0 +1,25 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+<title>View Email Template</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 style="display:inline-block"><strong>Email Template - {{ email_template.name }}</strong></h5>
+      <a class="btn btn-danger float-right" href="{% url 'app:email_templates' %}">X</a>
+    </div>
+    <div class="card-body">
+      <p>
+        <strong>Subject</strong> : {{ email_template.subject }}
+      </p>
+      <hr>
+      <p>
+        {{ email_template.body|safe }}
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

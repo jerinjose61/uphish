@@ -241,6 +241,12 @@ def add_email_template(request):
     return render(request, 'app/email_templates/add_email_template.html', {'form':form})
 
 @login_required
+def view_email_template(request, pk):
+    email_template = EmailTemplate.objects.get(pk = pk)
+    return render(request, 'app/email_templates/view_email_template.html',
+                    {'email_template':email_template})
+
+@login_required
 def edit_email_template(request, pk):
     email_template = EmailTemplate.objects.get(pk = pk)
 

@@ -26,6 +26,9 @@
           <tr>
             <td>{{ email_template.name }}</td>
             <td class="text-center">
+              <a title="View" class="btn btn-info" href="{% url 'app:view_email_template' pk=email_template.pk %}">
+                <i class="fas fa-eye"></i>
+              </a>
               <a title="Edit" class="btn btn-primary" href="{% url 'app:edit_email_template' pk=email_template.pk %}">
                 <i class="fas fa-edit"></i>
               </a>
