@@ -658,8 +658,12 @@ def track_data(request):
 
     CampaignResult.objects.filter(Q(campaign = campaign) & Q(target = target)).update(data_submitted_status = True)
 
-    DataSubmitted.objects.create(campaign = campaign, target = target,
-                                    data_submitted = submitted_data,
-                                    data_submit_time = datetime.now())
+    if campaign.capture_data == True:
+        DataSubmitted.objects.create(campaign = campaign, target = target,
+                                        data_submitted = submitted_data,
+                                        data_submit_time = datetime.now())
+    else:
+        DataSubmitted.objects.create(campaign = campaign, target = target,
+                                        data_submit_time = datetime.now())
 
     return HttpResponse('Data Submitted!')

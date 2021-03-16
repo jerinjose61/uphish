@@ -53,6 +53,7 @@ class Campaign(models.Model):
     phishing_page = models.ForeignKey(PhishingPage, on_delete = models.CASCADE)
     email_template = models.ForeignKey(EmailTemplate, on_delete = models.CASCADE)
     sending_profile = models.ForeignKey(SendingProfile, on_delete = models.CASCADE)
+    capture_data = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

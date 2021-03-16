@@ -52,4 +52,5 @@ class CampaignForm(forms.ModelForm):
             "phishing_page": "Phishing Page",
             "email_template": "Email Template",
             "sending_profile": "Sending Profile",
+            "capture_data": "Capture Data"
         }
