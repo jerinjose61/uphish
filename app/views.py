@@ -188,6 +188,21 @@ def add_phishing_page(request):
     return render(request, 'app/phishing_pages/add_phishing_page.html', {'form':form})
 
 @login_required
+def edit_phishing_page(request, pk):
+    phishing_page = PhishingPage.objects.get(pk = pk)
+    if request.method == "POST":
+        form = forms.PhishingPageForm(request.POST, instance = phishing_page)
+
+        if form.is_valid():
+            form.save()
+
+            return redirect('app:phishing_pages')
+    else:
+        form = forms.PhishingPageForm(instance = phishing_page)
+
+        return render(request, 'app/phishing_pages/edit_phishing_page.html', {'form':form})
+
+@login_required
 def delete_phishing_page(request, pk):
     phishing_page = PhishingPage.objects.get(pk = pk)
 

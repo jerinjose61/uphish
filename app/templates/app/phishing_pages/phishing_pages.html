@@ -26,8 +26,11 @@
           {% for phishing_page in phishing_pages %}
           <tr>
             <td>{{ phishing_page.name }}</td>
-            <td class="text-center">{{ phishing_page.phishing_url }}</td>
+            <td class="text-center"><a href="http://{{ phishing_page.phishing_url }}" target="_blank" rel="noopener noreferrer">{{ phishing_page.phishing_url }}</a></td>
             <td class="text-center">
+              <a title="Edit" class="btn btn-primary" href="{% url 'app:edit_phishing_page' pk=phishing_page.pk %}">
+                <i class="fas fa-edit"></i>
+              </a>
               <a title="Delete" class="btn btn-danger" href="{% url 'app:delete_phishing_page' pk=phishing_page.pk %}"><i class="fas fa-trash-alt"></i></a>
             </td>
           </tr>

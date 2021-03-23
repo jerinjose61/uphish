@@ -19,6 +19,7 @@ urlpatterns = [
     path('delete_target/<slug:pk>/', views.delete_target, name = 'delete_target'),
     path('phishing_pages/', views.phishing_pages, name = 'phishing_pages'),
     path('add_phishing_page/', views.add_phishing_page, name = 'add_phishing_page'),
+    path('edit_phishing_page/<slug:pk>/', views.edit_phishing_page, name = 'edit_phishing_page'),
     path('delete_phishing_page/<slug:pk>/', views.delete_phishing_page, name = 'delete_phishing_page'),
     path('email_templates/', views.email_templates, name = 'email_templates'),
     path('add_email_template/', views.add_email_template, name = 'add_email_template'),
