@@ -61,7 +61,7 @@ Please check the references section for the same.
 <ul>
   <li><a href="https://drive.google.com/file/d/1PpZpOoHHfV4xjOHXjbpMgxlbMoBW8_3l/view?usp=sharing">Uphish User Guide</a></li>
   <li><a href="https://drive.google.com/file/d/1Cp1Axg1qMdJtP8xs4UeUiADAsWfWHJQp/view?usp=sharing">UMC Deployment Guide</a></li>
-  <li><a href="https://drive.google.com/file/d/1hYPQk_AOjxg1MB0pSLHFOsfxsONLbj-c/view?usp=sharing">UPA Development Guide</a></li>
+  <li><a href="https://drive.google.com/file/d/1o6XMiWTcdb9UKFohE5fEIBvj5lAYeMLY/view?usp=sharing">UPA Development Guide</a></li>
   <li><a href="https://github.com/jerinjose61/upa-flask">Sample Flask UPAs</a></li>
   <li><a href="https://github.com/jerinjose61/uphish-email-templates">Sample HTML Email Templates</a></li>
 </ul>
