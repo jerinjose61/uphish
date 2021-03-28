@@ -614,7 +614,7 @@ def track_email(request, encrypted_campaign_id, encrypted_target_id):
 
     return HttpResponse('Email Opened!')
 
-# API End Point to know from FastAPI phsihing app that link has been clicked
+# API End Point to know from UPA that link has been clicked
 @csrf_exempt
 def track_link(request):
     # Get CID and TID from FastAPI Phishing App
@@ -647,7 +647,7 @@ def track_link(request):
 
     return HttpResponse('Phishing Link Clicked!')
 
-# API End Point to know from FastAPI phishing app that data has been submitted
+# API End Point to know from UPA that data has been submitted
 # API End Point to know the submitted data
 @csrf_exempt
 def track_data(request):
