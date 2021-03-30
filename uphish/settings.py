@@ -149,8 +149,9 @@ STATIC_ROOT = Path(BASE_DIR / 'static/')
 Q_CLUSTER = {
     'name': 'uphish',
     'workers': 8,
+    'retry': 1200,
+    'timeout': 900,
     'recycle': 500,
-    'timeout': 600,
     'compress': True,
     'save_limit': 250,
     'queue_limit': 500,
