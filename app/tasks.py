@@ -46,7 +46,8 @@ def launch_campaign(campaign_name, from_email, target_group, phishing_page, emai
                         'campaign_id':campaign_id,
                         'target_id':target_id,
                         'first_name':target.first_name,
-                        'last_name':target.last_name})
+                        'last_name':target.last_name,
+                        'email':target.email})
 
         try:
             email = EmailMessage(subject = subject, body = html_message, from_email = from_email,
